@@ -29,6 +29,7 @@ func main() {
 	router.HandleFunc("/migration", migrationHandler.Migrate).Methods(http.MethodGet)
 
 	router.HandleFunc("/user/register", userHandler.Register).Methods(http.MethodPost)
+	router.HandleFunc("/user/login", userHandler.Login).Methods(http.MethodPost)
 
 	log.Println("API is running in port: " + os.Getenv("PORT"))
 	err = http.ListenAndServe(":"+os.Getenv("PORT"), router)
