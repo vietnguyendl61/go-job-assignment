@@ -6,6 +6,7 @@ option go_package = "pricing/grpc/pricing-proto";
 message CreatePriceRequest {
   string job_id = 1;
   double price = 2;
+  string creator_id = 3;
 }
 
 message CreatePriceResponse {

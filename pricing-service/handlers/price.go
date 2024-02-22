@@ -36,7 +36,7 @@ func (h PriceHandler) Create(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	result, err := h.priceRepo.CreatePrice(r.Context(), price)
+	err = h.priceRepo.CreatePrice(r.Context(), price)
 	if err != nil {
 		log.Println("Error when create price: " + err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -44,5 +44,5 @@ func (h PriceHandler) Create(w http.ResponseWriter, r *http.Request) {
 	// Send a 201 created response
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(result)
+	json.NewEncoder(w).Encode(price)
 }

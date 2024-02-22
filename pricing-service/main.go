@@ -24,11 +24,10 @@ func main() {
 		log.Fatalln("Error when init db: " + err.Error())
 	}
 
-	migrationHandler := handlers.NewMigrationHandler(db)
-
-	handlerGrpc := pricingGrpcHandlers.NewGRPCHandlers()
-
 	priceRepo := repo.NewPriceRepo(db)
+
+	migrationHandler := handlers.NewMigrationHandler(db)
+	handlerGrpc := pricingGrpcHandlers.NewGRPCHandlers(priceRepo)
 	priceHandler := handlers.NewPriceHandler(priceRepo)
 
 	router := mux.NewRouter()
