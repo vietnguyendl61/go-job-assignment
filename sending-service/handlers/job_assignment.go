@@ -5,19 +5,19 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"pricing-service/model"
-	"pricing-service/repo"
+	"sending-service/model"
+	"sending-service/repo"
 )
 
-type PriceHandler struct {
-	jobRepo repo.PriceRepo
+type JobAssignmentHandler struct {
+	jobRepo repo.JobAssignmentRepo
 }
 
-func NewPriceHandler(jobRepo repo.PriceRepo) PriceHandler {
-	return PriceHandler{jobRepo: jobRepo}
+func NewJobAssignmentHandler(jobRepo repo.JobAssignmentRepo) JobAssignmentHandler {
+	return JobAssignmentHandler{jobRepo: jobRepo}
 }
 
-func (h PriceHandler) Create(w http.ResponseWriter, r *http.Request) {
+func (h JobAssignmentHandler) Create(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -30,13 +30,13 @@ func (h PriceHandler) Create(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 
-	job := &model.Price{}
+	job := &model.JobAssignment{}
 	err = json.Unmarshal(body, &job)
 	if err != nil {
 		log.Println(err)
 	}
 
-	result, err := h.jobRepo.CreatePrice(r.Context(), job)
+	result, err := h.jobRepo.CreateJobAssignment(r.Context(), job)
 	if err != nil {
 		log.Println("Error when create job: " + err.Error())
 		w.WriteHeader(http.StatusInternalServerError)

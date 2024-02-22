@@ -3,7 +3,7 @@ package repo
 import (
 	"context"
 	"gorm.io/gorm"
-	"pricing-service/model"
+	"sending-service/model"
 	"time"
 )
 
@@ -11,15 +11,15 @@ const (
 	generalQueryTimeout = 600 * time.Second
 )
 
-type PriceRepo struct {
+type JobAssignmentRepo struct {
 	db *gorm.DB
 }
 
-func NewPriceRepo(db *gorm.DB) PriceRepo {
-	return PriceRepo{db: db}
+func NewJobAssignmentRepo(db *gorm.DB) JobAssignmentRepo {
+	return JobAssignmentRepo{db: db}
 }
 
-func (r PriceRepo) CreatePrice(ctx context.Context, job *model.Price) (*model.Price, error) {
+func (r JobAssignmentRepo) CreateJobAssignment(ctx context.Context, job *model.JobAssignment) (*model.JobAssignment, error) {
 	ctx, cancel := context.WithTimeout(ctx, generalQueryTimeout)
 	defer cancel()
 

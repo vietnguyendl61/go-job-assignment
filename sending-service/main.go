@@ -9,8 +9,8 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"pricing-service/handlers"
-	"pricing-service/repo"
+	"sending-service/handlers"
+	"sending-service/repo"
 )
 
 func main() {
@@ -22,13 +22,13 @@ func main() {
 
 	migrationHandler := handlers.NewMigrationHandler(db)
 
-	jobRepo := repo.NewPriceRepo(db)
-	jobHandler := handlers.NewPriceHandler(jobRepo)
+	jobRepo := repo.NewJobAssignmentRepo(db)
+	jobHandler := handlers.NewJobAssignmentHandler(jobRepo)
 
 	router := mux.NewRouter()
 	router.HandleFunc("/migration", migrationHandler.Migrate).Methods(http.MethodGet)
 
-	router.HandleFunc("/price/create", jobHandler.Create).Methods(http.MethodPost)
+	router.HandleFunc("/job-assignment/create", jobHandler.Create).Methods(http.MethodPost)
 
 	log.Println("API is running in port: " + os.Getenv("PORT"))
 	err = http.ListenAndServe(":"+os.Getenv("PORT"), router)

@@ -1,4 +1,4 @@
-module pricing-service
+module sending-service
 
 go 1.19.0
 
