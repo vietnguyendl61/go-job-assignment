@@ -15,8 +15,8 @@ type PriceRepo struct {
 	db *gorm.DB
 }
 
-func NewPriceRepo(db *gorm.DB) *PriceRepo {
-	return &PriceRepo{db: db}
+func NewPriceRepo(db *gorm.DB) PriceRepo {
+	return PriceRepo{db: db}
 }
 
 func (r PriceRepo) CreatePrice(ctx context.Context, job *model.Price) (*model.Price, error) {

@@ -10,14 +10,14 @@ import (
 )
 
 type PriceHandler struct {
-	jobRepo *repo.PriceRepo
+	jobRepo repo.PriceRepo
 }
 
-func NewPriceHandler(jobRepo *repo.PriceRepo) *PriceHandler {
-	return &PriceHandler{jobRepo: jobRepo}
+func NewPriceHandler(jobRepo repo.PriceRepo) PriceHandler {
+	return PriceHandler{jobRepo: jobRepo}
 }
 
-func (h *PriceHandler) Create(w http.ResponseWriter, r *http.Request) {
+func (h PriceHandler) Create(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {

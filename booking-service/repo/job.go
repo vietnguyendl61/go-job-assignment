@@ -15,8 +15,8 @@ type JobRepo struct {
 	db *gorm.DB
 }
 
-func NewJobRepo(db *gorm.DB) *JobRepo {
-	return &JobRepo{db: db}
+func NewJobRepo(db *gorm.DB) JobRepo {
+	return JobRepo{db: db}
 }
 
 func (r JobRepo) CreateJob(ctx context.Context, job *model.Job) (*model.Job, error) {

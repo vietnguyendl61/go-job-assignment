@@ -28,7 +28,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/migration", migrationHandler.Migrate).Methods(http.MethodGet)
 
-	router.HandleFunc("/job/create", jobHandler.Create).Methods(http.MethodPost)
+	router.HandleFunc("/price/create", jobHandler.Create).Methods(http.MethodPost)
 
 	log.Println("API is running in port: " + os.Getenv("PORT"))
 	err = http.ListenAndServe(":"+os.Getenv("PORT"), router)

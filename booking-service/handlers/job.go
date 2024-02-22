@@ -10,14 +10,14 @@ import (
 )
 
 type JobHandler struct {
-	jobRepo *repo.JobRepo
+	jobRepo repo.JobRepo
 }
 
-func NewJobHandler(jobRepo *repo.JobRepo) *JobHandler {
-	return &JobHandler{jobRepo: jobRepo}
+func NewJobHandler(jobRepo repo.JobRepo) JobHandler {
+	return JobHandler{jobRepo: jobRepo}
 }
 
-func (h *JobHandler) Create(w http.ResponseWriter, r *http.Request) {
+func (h JobHandler) Create(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
