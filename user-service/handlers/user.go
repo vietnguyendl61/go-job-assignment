@@ -17,7 +17,7 @@ func NewUserHandler(userRepo repo.UserRepo) UserHandler {
 	return UserHandler{userRepo: userRepo}
 }
 
-func (h UserHandler) Create(w http.ResponseWriter, r *http.Request) {
+func (h UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		err := r.Body.Close()
 		if err != nil {
@@ -25,7 +25,6 @@ func (h UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 	body, err := io.ReadAll(r.Body)
-
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -38,8 +37,10 @@ func (h UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	result, err := h.userRepo.CreateUser(r.Context(), user)
 	if err != nil {
-		log.Println("Error when create user: " + err.Error())
+		message := "Error when create user: " + err.Error()
+		log.Println(message)
 		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(message)
 	}
 	// Send a 201 created response
 	w.Header().Add("Content-Type", "application/json")
