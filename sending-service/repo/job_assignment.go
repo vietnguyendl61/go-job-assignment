@@ -19,14 +19,14 @@ func NewJobAssignmentRepo(db *gorm.DB) JobAssignmentRepo {
 	return JobAssignmentRepo{db: db}
 }
 
-func (r JobAssignmentRepo) CreateJobAssignment(ctx context.Context, job *model.JobAssignment) (*model.JobAssignment, error) {
+func (r JobAssignmentRepo) CreateJobAssignment(ctx context.Context, jobAssignment *model.JobAssignment) (*model.JobAssignment, error) {
 	ctx, cancel := context.WithTimeout(ctx, generalQueryTimeout)
 	defer cancel()
 
-	err := r.db.WithContext(ctx).Create(job).Error
+	err := r.db.WithContext(ctx).Create(jobAssignment).Error
 	if err != nil {
 		return nil, err
 	}
 
-	return job, nil
+	return jobAssignment, nil
 }

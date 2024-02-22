@@ -10,11 +10,11 @@ import (
 )
 
 type JobAssignmentHandler struct {
-	jobRepo repo.JobAssignmentRepo
+	jobAssignmentRepo repo.JobAssignmentRepo
 }
 
-func NewJobAssignmentHandler(jobRepo repo.JobAssignmentRepo) JobAssignmentHandler {
-	return JobAssignmentHandler{jobRepo: jobRepo}
+func NewJobAssignmentHandler(jobAssignmentRepo repo.JobAssignmentRepo) JobAssignmentHandler {
+	return JobAssignmentHandler{jobAssignmentRepo: jobAssignmentRepo}
 }
 
 func (h JobAssignmentHandler) Create(w http.ResponseWriter, r *http.Request) {
@@ -30,15 +30,15 @@ func (h JobAssignmentHandler) Create(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 
-	job := &model.JobAssignment{}
-	err = json.Unmarshal(body, &job)
+	jobAssignment := &model.JobAssignment{}
+	err = json.Unmarshal(body, &jobAssignment)
 	if err != nil {
 		log.Println(err)
 	}
 
-	result, err := h.jobRepo.CreateJobAssignment(r.Context(), job)
+	result, err := h.jobAssignmentRepo.CreateJobAssignment(r.Context(), jobAssignment)
 	if err != nil {
-		log.Println("Error when create job: " + err.Error())
+		log.Println("Error when create jobAssignment: " + err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 	// Send a 201 created response

@@ -2,13 +2,11 @@ package model
 
 import (
 	"github.com/google/uuid"
-	"time"
 )
 
 type JobAssignment struct {
 	BaseModel
-	BookDate    time.Time `json:"book_date" gorm:"column:book_date;not null"`
-	CustomerId  uuid.UUID `json:"customer_id" gorm:"column:customer_id;type:uuid;not null"`
-	Description string    `json:"description" gorm:"column:description;type:text"`
-	JobStatus   string    `json:"status" gorm:"column:status;type:text;not null"`
+	JobId     uuid.UUID `json:"job_id" gorm:"column:job_id;type:uuid;not null"`
+	HelperId  uuid.UUID `json:"helper_id" gorm:"column:helper_id;type:uuid;not null"`
+	JobStatus string    `json:"job_status" gorm:"column:job_status;type:text;not null"`
 }

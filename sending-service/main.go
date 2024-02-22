@@ -22,8 +22,8 @@ func main() {
 
 	migrationHandler := handlers.NewMigrationHandler(db)
 
-	jobRepo := repo.NewJobAssignmentRepo(db)
-	jobHandler := handlers.NewJobAssignmentHandler(jobRepo)
+	jobAssignment := repo.NewJobAssignmentRepo(db)
+	jobHandler := handlers.NewJobAssignmentHandler(jobAssignment)
 
 	router := mux.NewRouter()
 	router.HandleFunc("/migration", migrationHandler.Migrate).Methods(http.MethodGet)

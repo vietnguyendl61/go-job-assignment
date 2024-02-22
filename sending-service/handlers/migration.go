@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"booking-service/model"
 	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"sending-service/model"
 )
 
 type MigrationHandler struct {
@@ -18,7 +18,7 @@ func NewMigrationHandler(db *gorm.DB) *MigrationHandler {
 func (h *MigrationHandler) Migrate(w http.ResponseWriter, r *http.Request) {
 	_ = h.db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
 	models := []interface{}{
-		&model.Job{},
+		&model.JobAssignment{},
 	}
 
 	for _, m := range models {
