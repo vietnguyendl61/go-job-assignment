@@ -22,13 +22,13 @@ func main() {
 
 	migrationHandler := handlers.NewMigrationHandler(db)
 
-	jobRepo := repo.NewPriceRepo(db)
-	jobHandler := handlers.NewPriceHandler(jobRepo)
+	priceRepo := repo.NewPriceRepo(db)
+	priceHandler := handlers.NewPriceHandler(priceRepo)
 
 	router := mux.NewRouter()
 	router.HandleFunc("/migration", migrationHandler.Migrate).Methods(http.MethodGet)
 
-	router.HandleFunc("/price/create", jobHandler.Create).Methods(http.MethodPost)
+	router.HandleFunc("/price/create", priceHandler.Create).Methods(http.MethodPost)
 
 	log.Println("API is running in port: " + os.Getenv("PORT"))
 	err = http.ListenAndServe(":"+os.Getenv("PORT"), router)

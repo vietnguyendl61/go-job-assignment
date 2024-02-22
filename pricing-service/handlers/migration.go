@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"booking-service/model"
 	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"pricing-service/model"
 )
 
 type MigrationHandler struct {

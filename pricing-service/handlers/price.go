@@ -10,11 +10,11 @@ import (
 )
 
 type PriceHandler struct {
-	jobRepo repo.PriceRepo
+	priceRepo repo.PriceRepo
 }
 
-func NewPriceHandler(jobRepo repo.PriceRepo) PriceHandler {
-	return PriceHandler{jobRepo: jobRepo}
+func NewPriceHandler(priceRepo repo.PriceRepo) PriceHandler {
+	return PriceHandler{priceRepo: priceRepo}
 }
 
 func (h PriceHandler) Create(w http.ResponseWriter, r *http.Request) {
@@ -30,15 +30,15 @@ func (h PriceHandler) Create(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 
-	job := &model.Price{}
-	err = json.Unmarshal(body, &job)
+	price := &model.Price{}
+	err = json.Unmarshal(body, &price)
 	if err != nil {
 		log.Println(err)
 	}
 
-	result, err := h.jobRepo.CreatePrice(r.Context(), job)
+	result, err := h.priceRepo.CreatePrice(r.Context(), price)
 	if err != nil {
-		log.Println("Error when create job: " + err.Error())
+		log.Println("Error when create price: " + err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 	// Send a 201 created response
