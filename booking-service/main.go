@@ -1,6 +1,7 @@
 package main
 
 import (
+	grpcHandler "booking-service/grpc/handlers"
 	"booking-service/handlers"
 	"booking-service/repo"
 	"fmt"
@@ -21,9 +22,10 @@ func main() {
 	}
 
 	migrationHandler := handlers.NewMigrationHandler(db)
+	priceHandlerGrpc := grpcHandler.NewPriceGrpcHandlers()
 
 	jobRepo := repo.NewJobRepo(db)
-	jobHandler := handlers.NewJobHandler(jobRepo)
+	jobHandler := handlers.NewJobHandler(jobRepo, priceHandlerGrpc)
 
 	router := mux.NewRouter()
 	router.HandleFunc("/migration", migrationHandler.Migrate).Methods(http.MethodGet)
@@ -45,7 +47,6 @@ func InitDB() *gorm.DB {
 		os.Getenv("DB_HOST"),
 		os.Getenv("DB_PORT"))
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-
 	if err != nil {
 		log.Fatalln(err)
 	}

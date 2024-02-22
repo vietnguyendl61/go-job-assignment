@@ -18,15 +18,16 @@ type JobRepo struct {
 func NewJobRepo(db *gorm.DB) JobRepo {
 	return JobRepo{db: db}
 }
-
-func (r JobRepo) CreateJob(ctx context.Context, job *model.Job) (*model.Job, error) {
+func (r JobRepo) CreateTx(ctx context.Context) (*gorm.DB, context.CancelFunc) {
 	ctx, cancel := context.WithTimeout(ctx, generalQueryTimeout)
-	defer cancel()
+	return r.db.WithContext(ctx), cancel
+}
 
-	err := r.db.WithContext(ctx).Create(job).Error
+func (r JobRepo) CreateJob(tx *gorm.DB, job *model.Job) error {
+	err := tx.Create(job).Error
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return job, nil
+	return nil
 }
