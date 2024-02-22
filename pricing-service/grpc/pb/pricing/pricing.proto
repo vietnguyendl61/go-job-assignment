@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package pricing;
+option go_package = "pricing/grpc/pricing-proto";
+
+message CreatePriceRequest {
+  string job_id = 1;
+  double price = 2;
+}
+
+message CreatePriceResponse {
+  int64 status_code = 1;
+  string message = 2;
+}
+
+service PricingGrpc {
+  rpc CreatePrice(CreatePriceRequest) returns (CreatePriceResponse) {}
+}
