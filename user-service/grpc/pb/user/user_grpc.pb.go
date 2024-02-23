@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserGrpcClient interface {
-	GetAllUserId(ctx context.Context, in *GetAllUserIdRequest, opts ...grpc.CallOption) (*GetAllUserIdResponse, error)
+	GetAllHelperId(ctx context.Context, in *GetAllHelperIdRequest, opts ...grpc.CallOption) (*GetAllHelperIdResponse, error)
 }
 
 type userGrpcClient struct {
@@ -33,9 +33,9 @@ func NewUserGrpcClient(cc grpc.ClientConnInterface) UserGrpcClient {
 	return &userGrpcClient{cc}
 }
 
-func (c *userGrpcClient) GetAllUserId(ctx context.Context, in *GetAllUserIdRequest, opts ...grpc.CallOption) (*GetAllUserIdResponse, error) {
-	out := new(GetAllUserIdResponse)
-	err := c.cc.Invoke(ctx, "/user.UserGrpc/GetAllUserId", in, out, opts...)
+func (c *userGrpcClient) GetAllHelperId(ctx context.Context, in *GetAllHelperIdRequest, opts ...grpc.CallOption) (*GetAllHelperIdResponse, error) {
+	out := new(GetAllHelperIdResponse)
+	err := c.cc.Invoke(ctx, "/user.UserGrpc/GetAllHelperId", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (c *userGrpcClient) GetAllUserId(ctx context.Context, in *GetAllUserIdReque
 // All implementations must embed UnimplementedUserGrpcServer
 // for forward compatibility
 type UserGrpcServer interface {
-	GetAllUserId(context.Context, *GetAllUserIdRequest) (*GetAllUserIdResponse, error)
+	GetAllHelperId(context.Context, *GetAllHelperIdRequest) (*GetAllHelperIdResponse, error)
 	mustEmbedUnimplementedUserGrpcServer()
 }
 
@@ -54,8 +54,8 @@ type UserGrpcServer interface {
 type UnimplementedUserGrpcServer struct {
 }
 
-func (UnimplementedUserGrpcServer) GetAllUserId(context.Context, *GetAllUserIdRequest) (*GetAllUserIdResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAllUserId not implemented")
+func (UnimplementedUserGrpcServer) GetAllHelperId(context.Context, *GetAllHelperIdRequest) (*GetAllHelperIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllHelperId not implemented")
 }
 func (UnimplementedUserGrpcServer) mustEmbedUnimplementedUserGrpcServer() {}
 
@@ -70,20 +70,20 @@ func RegisterUserGrpcServer(s grpc.ServiceRegistrar, srv UserGrpcServer) {
 	s.RegisterService(&UserGrpc_ServiceDesc, srv)
 }
 
-func _UserGrpc_GetAllUserId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAllUserIdRequest)
+func _UserGrpc_GetAllHelperId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllHelperIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserGrpcServer).GetAllUserId(ctx, in)
+		return srv.(UserGrpcServer).GetAllHelperId(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/user.UserGrpc/GetAllUserId",
+		FullMethod: "/user.UserGrpc/GetAllHelperId",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserGrpcServer).GetAllUserId(ctx, req.(*GetAllUserIdRequest))
+		return srv.(UserGrpcServer).GetAllHelperId(ctx, req.(*GetAllHelperIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -96,8 +96,8 @@ var UserGrpc_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*UserGrpcServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetAllUserId",
-			Handler:    _UserGrpc_GetAllUserId_Handler,
+			MethodName: "GetAllHelperId",
+			Handler:    _UserGrpc_GetAllHelperId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -17,20 +17,20 @@ func NewGRPCHandlers(userRepo repo.UserRepo) GRPCHandlers {
 	}
 }
 
-func (h GRPCHandlers) GetAllUserId(ctx context.Context, request *userGrpc.GetAllUserIdRequest) (*userGrpc.GetAllUserIdResponse, error) {
+func (h GRPCHandlers) GetAllUserId(ctx context.Context, request *userGrpc.GetAllHelperIdRequest) (*userGrpc.GetAllHelperIdResponse, error) {
 	var (
-		err        error
-		listUserId []string
-		response   *userGrpc.GetAllUserIdResponse
+		err          error
+		listHelperId []string
+		response     *userGrpc.GetAllHelperIdResponse
 	)
 
-	listUserId, err = h.userRepo.GetListUerId(ctx)
+	listHelperId, err = h.userRepo.GetListHelperId(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	response = &userGrpc.GetAllUserIdResponse{
-		ListUserId: listUserId,
+	response = &userGrpc.GetAllHelperIdResponse{
+		ListHelperId: listHelperId,
 	}
 	return response, nil
 }

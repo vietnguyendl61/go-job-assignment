@@ -50,7 +50,7 @@ func (r UserRepo) GetUserByUserNameAndPassword(ctx context.Context, request mode
 	return user, nil
 }
 
-func (r UserRepo) GetListUerId(ctx context.Context) ([]string, error) {
+func (r UserRepo) GetListHelperId(ctx context.Context) ([]string, error) {
 	var (
 		err    error
 		result []string
@@ -59,7 +59,7 @@ func (r UserRepo) GetListUerId(ctx context.Context) ([]string, error) {
 	ctx, cancel = context.WithTimeout(ctx, generalQueryTimeout)
 	defer cancel()
 
-	err = r.db.WithContext(ctx).Pluck("id", &result).Error
+	err = r.db.WithContext(ctx).Where("is_helper = true").Pluck("id", &result).Error
 	if err != nil {
 		return nil, err
 	}

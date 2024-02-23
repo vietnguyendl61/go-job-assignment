@@ -6,6 +6,7 @@ option go_package = "sending/grpc/sending-proto";
 message CreateJobAssignmentRequest {
   repeated string list_job_id = 1;
   string creator_id = 2;
+  string job_id = 3;
 }
 
 message CreateJobAssignmentResponse {

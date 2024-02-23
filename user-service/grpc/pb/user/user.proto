@@ -5,13 +5,13 @@ option go_package = "user/grpc/user-proto";
 
 
 
-message GetAllUserIdRequest {
+message GetAllHelperIdRequest {
 }
 
-message GetAllUserIdResponse {
-  repeated string list_user_id = 1;
+message GetAllHelperIdResponse {
+  repeated string list_helper_id = 1;
 }
 
 service UserGrpc {
-  rpc GetAllUserId(GetAllUserIdRequest) returns (GetAllUserIdResponse) {}
+  rpc GetAllHelperId(GetAllHelperIdRequest) returns (GetAllHelperIdResponse) {}
 }

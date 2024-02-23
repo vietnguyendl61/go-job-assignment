@@ -22,10 +22,10 @@ func (h UserGrpcHandlers) clientUserGrpc() (userGrpc.UserGrpcClient, error) {
 	return userGrpc.NewUserGrpcClient(conn), nil
 }
 
-func (h UserGrpcHandlers) GetAllUserId(ctx context.Context) (*userGrpc.GetAllUserIdResponse, error) {
+func (h UserGrpcHandlers) GetAllHelperId(ctx context.Context) (*userGrpc.GetAllHelperIdResponse, error) {
 	var (
 		err         error
-		grpcRequest *userGrpc.GetAllUserIdRequest
+		grpcRequest *userGrpc.GetAllHelperIdRequest
 	)
 	ctx, cancel := context.WithTimeout(ctx, baseGrpc.Timeout)
 	defer cancel()
@@ -35,5 +35,5 @@ func (h UserGrpcHandlers) GetAllUserId(ctx context.Context) (*userGrpc.GetAllUse
 		return nil, err
 	}
 
-	return client.GetAllUserId(ctx, grpcRequest)
+	return client.GetAllHelperId(ctx, grpcRequest)
 }
