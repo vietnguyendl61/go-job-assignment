@@ -49,3 +49,19 @@ func (r UserRepo) GetUserByUserNameAndPassword(ctx context.Context, request mode
 
 	return user, nil
 }
+
+func (r UserRepo) GetListUerId(ctx context.Context) ([]string, error) {
+	var (
+		err    error
+		result []string
+		cancel context.CancelFunc
+	)
+	ctx, cancel = context.WithTimeout(ctx, generalQueryTimeout)
+	defer cancel()
+
+	err = r.db.WithContext(ctx).Pluck("id", &result).Error
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
