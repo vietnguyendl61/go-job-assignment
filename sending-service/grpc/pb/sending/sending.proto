@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package sending;
+option go_package = "sending/grpc/sending-proto";
+
+message CreateJobAssignmentRequest {
+  repeated string list_job_id = 1;
+  string creator_id = 2;
+}
+
+message CreateJobAssignmentResponse {
+  int64 status_code = 1;
+  string message = 2;
+}
+
+service PricingGrpc {
+  rpc CreateJobAssignment(CreateJobAssignmentRequest) returns (CreateJobAssignmentResponse) {}
+}
