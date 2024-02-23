@@ -1,12 +1,12 @@
 package handlers
 
 import (
-	"encoding/json"
-	"io"
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-	"sending-service/model"
 	"sending-service/repo"
+	"sending-service/utils"
 )
 
 type JobAssignmentHandler struct {
@@ -17,32 +17,23 @@ func NewJobAssignmentHandler(jobAssignmentRepo repo.JobAssignmentRepo) JobAssign
 	return JobAssignmentHandler{jobAssignmentRepo: jobAssignmentRepo}
 }
 
-func (h JobAssignmentHandler) Create(w http.ResponseWriter, r *http.Request) {
-	defer func() {
-		err := r.Body.Close()
-		if err != nil {
-			log.Println("Error when close request body: " + err.Error())
-		}
-	}()
-	body, err := io.ReadAll(r.Body)
+func (h JobAssignmentHandler) GetOne(w http.ResponseWriter, r *http.Request) {
+	Id := mux.Vars(r)["id"]
 
+	UUID, err := uuid.Parse(Id)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println("Error when parse id: " + err.Error())
+		utils.ErrorResponse(w, http.StatusBadRequest, "Error when parse id: "+err.Error())
+		return
 	}
 
-	jobAssignment := &model.JobAssignment{}
-	err = json.Unmarshal(body, &jobAssignment)
+	job, err := h.jobAssignmentRepo.GetOne(r.Context(), UUID.String())
 	if err != nil {
-		log.Println(err)
+		log.Println("Error when get job: " + err.Error())
+		utils.ErrorResponse(w, http.StatusInternalServerError, "Error when get job: "+err.Error())
+		return
 	}
 
-	err = h.jobAssignmentRepo.CreateJobAssignment(r.Context(), jobAssignment)
-	if err != nil {
-		log.Println("Error when create jobAssignment: " + err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-	// Send a 201 created response
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(jobAssignment)
+	utils.ResponseWithData(w, http.StatusOK, job)
+	return
 }

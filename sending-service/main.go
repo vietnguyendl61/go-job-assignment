@@ -34,7 +34,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/migration", migrationHandler.Migrate).Methods(http.MethodGet)
 
-	router.HandleFunc("/job-assignment/create", jobHandler.Create).Methods(http.MethodPost)
+	router.HandleFunc("/job-assignment/get-one/{id}", jobHandler.GetOne).Methods(http.MethodGet)
 
 	go StartGRPCServer(sendingHandlerGrpc)
 
