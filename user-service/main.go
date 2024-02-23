@@ -4,11 +4,15 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"google.golang.org/grpc"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
+	"net"
 	"net/http"
 	"os"
+	userGrpcHandlers "user-service/grpc/handlers"
+	userGrpc "user-service/grpc/pb/user"
 	"user-service/handlers"
 	"user-service/repo"
 )
@@ -20,9 +24,10 @@ func main() {
 		log.Fatalln("Error when init db: " + err.Error())
 	}
 
-	migrationHandler := handlers.NewMigrationHandler(db)
-
 	userRepo := repo.NewUserRepo(db)
+
+	migrationHandler := handlers.NewMigrationHandler(db)
+	userHandlerGrpc := userGrpcHandlers.NewGRPCHandlers(userRepo)
 	userHandler := handlers.NewUserHandler(userRepo)
 
 	router := mux.NewRouter()
@@ -30,6 +35,8 @@ func main() {
 
 	router.HandleFunc("/user/register", userHandler.Register).Methods(http.MethodPost)
 	router.HandleFunc("/user/login", userHandler.Login).Methods(http.MethodPost)
+
+	go StartGRPCServer(userHandlerGrpc)
 
 	log.Println("API is running in port: " + os.Getenv("PORT"))
 	err = http.ListenAndServe(":"+os.Getenv("PORT"), router)
@@ -52,4 +59,23 @@ func InitDB() *gorm.DB {
 	}
 
 	return db
+}
+
+func StartGRPCServer(handleGRPC userGrpcHandlers.GRPCHandlers) {
+	var err error
+
+	grpcListener, err := net.Listen("tcp", fmt.Sprintf(":%s", os.Getenv("GRPC_PORT")))
+	if err != nil {
+		log.Fatalf("failed to listen GRPC: %v", err)
+	}
+
+	grpcServer := grpc.NewServer()
+	userGrpc.RegisterPricingGrpcServer(grpcServer, handleGRPC)
+
+	log.Printf("Start listening GRPC server on port %s", os.Getenv("GRPC_PORT"))
+	if err := grpcServer.Serve(grpcListener); err != nil {
+		log.Fatalf("failed to listen GRPC: %v", err)
+	}
+
+	grpcServer.Stop()
 }

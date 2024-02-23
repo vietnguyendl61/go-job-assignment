@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package user;
+option go_package = "user/grpc/user-proto";
+
+
+
+message GetAllUserIdRequest {
+}
+
+message GetAllUserIdResponse {
+  repeated string list_user_id = 1;
+}
+
+service PricingGrpc {
+  rpc GetAllUserId(GetAllUserIdRequest) returns (GetAllUserIdResponse) {}
+}
