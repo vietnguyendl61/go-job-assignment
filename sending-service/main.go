@@ -70,7 +70,7 @@ func StartGRPCServer(handleGRPC sendingGrpcHandlers.GRPCHandlers) {
 	}
 
 	grpcServer := grpc.NewServer()
-	sendingGrpc.RegisterPricingGrpcServer(grpcServer, handleGRPC)
+	sendingGrpc.RegisterSendingGrpcServer(grpcServer, handleGRPC)
 
 	log.Printf("Start listening GRPC server on port %s", os.Getenv("GRPC_PORT"))
 	if err := grpcServer.Serve(grpcListener); err != nil {

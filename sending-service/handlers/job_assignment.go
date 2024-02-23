@@ -36,7 +36,7 @@ func (h JobAssignmentHandler) Create(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	result, err := h.jobAssignmentRepo.CreateJobAssignment(r.Context(), jobAssignment)
+	err = h.jobAssignmentRepo.CreateJobAssignment(r.Context(), jobAssignment)
 	if err != nil {
 		log.Println("Error when create jobAssignment: " + err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -44,5 +44,5 @@ func (h JobAssignmentHandler) Create(w http.ResponseWriter, r *http.Request) {
 	// Send a 201 created response
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(result)
+	json.NewEncoder(w).Encode(jobAssignment)
 }

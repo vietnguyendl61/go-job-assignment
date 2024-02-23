@@ -36,7 +36,10 @@ func (r JobAssignmentRepo) GetListHelperIdByJobId(ctx context.Context, listJobId
 	defer cancel()
 
 	var result []string
-	err := r.db.WithContext(ctx).Where("job_id in (?)", listJobId).Pluck("helper_id", &result).Error
+	err := r.db.WithContext(ctx).Table("job_assignments").
+		Where("job_id in (?)", listJobId).
+		Where("job_status = ?", "Processing").
+		Pluck("helper_id", &result).Error
 	if err != nil {
 		return nil, err
 	}

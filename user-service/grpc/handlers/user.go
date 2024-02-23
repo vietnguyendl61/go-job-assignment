@@ -17,7 +17,7 @@ func NewGRPCHandlers(userRepo repo.UserRepo) GRPCHandlers {
 	}
 }
 
-func (h GRPCHandlers) GetAllUserId(ctx context.Context, request *userGrpc.GetAllHelperIdRequest) (*userGrpc.GetAllHelperIdResponse, error) {
+func (h GRPCHandlers) GetAllHelperId(ctx context.Context, request *userGrpc.GetAllHelperIdRequest) (*userGrpc.GetAllHelperIdResponse, error) {
 	var (
 		err          error
 		listHelperId []string

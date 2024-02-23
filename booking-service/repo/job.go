@@ -37,10 +37,10 @@ func (r JobRepo) GetListJobIdByBookDate(ctx context.Context, bookDate time.Time)
 	defer cancel()
 
 	var result []string
-	err := r.db.WithContext(ctx).Table("job").
+	err := r.db.WithContext(ctx).Table("jobs").
 		Where("book_date between DATE_TRUNC('day', cast(? as timestamp)) and "+
 			"DATE_TRUNC('day', CAST(? AS timestamp)) + INTERVAL '1 day' - INTERVAL '1 microsecond'", bookDate, bookDate).
-		Pluck("job_id", &result).Error
+		Pluck("id", &result).Error
 	if err != nil {
 		return nil, err
 	}

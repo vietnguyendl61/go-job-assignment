@@ -88,13 +88,6 @@ func (h JobHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	jobRequest.JobId = job.ID
 
-	_, err = h.priceHandlerGrpc.CreatePrice(tx.Statement.Context, jobRequest)
-	if err != nil {
-		log.Println("Error when create job: " + err.Error())
-		utils.ErrorResponse(w, http.StatusBadRequest, "Error when create job: "+err.Error())
-		return
-	}
-
 	var listId []string
 	listId, err = h.jobRepo.GetListJobIdByBookDate(r.Context(), job.BookDate)
 	if err != nil {
@@ -108,6 +101,13 @@ func (h JobHandler) Create(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error when create job assignment: " + err.Error())
 		utils.ErrorResponse(w, http.StatusInternalServerError, "Error when create job assignment: "+err.Error())
+		return
+	}
+
+	_, err = h.priceHandlerGrpc.CreatePrice(tx.Statement.Context, jobRequest)
+	if err != nil {
+		log.Println("Error when create job: " + err.Error())
+		utils.ErrorResponse(w, http.StatusBadRequest, "Error when create job: "+err.Error())
 		return
 	}
 

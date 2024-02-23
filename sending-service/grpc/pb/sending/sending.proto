@@ -14,6 +14,6 @@ message CreateJobAssignmentResponse {
   string message = 2;
 }
 
-service PricingGrpc {
+service SendingGrpc {
   rpc CreateJobAssignment(CreateJobAssignmentRequest) returns (CreateJobAssignmentResponse) {}
 }

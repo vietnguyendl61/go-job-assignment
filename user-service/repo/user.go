@@ -59,7 +59,7 @@ func (r UserRepo) GetListHelperId(ctx context.Context) ([]string, error) {
 	ctx, cancel = context.WithTimeout(ctx, generalQueryTimeout)
 	defer cancel()
 
-	err = r.db.WithContext(ctx).Where("is_helper = true").Pluck("id", &result).Error
+	err = r.db.WithContext(ctx).Table("users").Where("is_helper = true").Pluck("id", &result).Error
 	if err != nil {
 		return nil, err
 	}

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"github.com/google/uuid"
 	"math/rand"
 	sendingGrpc "sending-service/grpc/pb/sending"
@@ -11,7 +12,7 @@ import (
 )
 
 type GRPCHandlers struct {
-	sendingGrpc.UnimplementedPricingGrpcServer
+	sendingGrpc.UnsafeSendingGrpcServer
 	jobAssignmentRepo repo.JobAssignmentRepo
 	userHandlerGrpc   UserGrpcHandlers
 }
@@ -51,7 +52,7 @@ func (h GRPCHandlers) CreateJobAssignment(ctx context.Context, request *sendingG
 		return nil, err
 	}
 
-	if len(listHelperId) == 0 {
+	if len(listHelperId) == 0 && len(userResponse.ListHelperId) > 0 {
 		userId, err := uuid.Parse(userResponse.ListHelperId[rand.Intn(len(userResponse.ListHelperId))])
 		if err != nil {
 			return nil, err
@@ -62,15 +63,21 @@ func (h GRPCHandlers) CreateJobAssignment(ctx context.Context, request *sendingG
 		}
 	} else if len(listHelperId) > 0 {
 		res := elementsNotInSlice(userResponse.ListHelperId, listHelperId)
-		userId, err := uuid.Parse(res[rand.Intn(len(res))])
-		if err != nil {
-			return nil, err
-		}
+		if len(res) > 0 {
+			userId, err := uuid.Parse(res[rand.Intn(len(res))])
+			if err != nil {
+				return nil, err
+			}
 
-		jobAssignment = &model.JobAssignment{
-			HelperId: userId,
-			JobId:    jobId,
+			jobAssignment = &model.JobAssignment{
+				HelperId: userId,
+				JobId:    jobId,
+			}
+		} else {
+			return nil, fmt.Errorf("No helper is available")
 		}
+	} else {
+		return nil, fmt.Errorf("No helper is available")
 	}
 
 	if request.CreatorId != "" {
@@ -80,6 +87,7 @@ func (h GRPCHandlers) CreateJobAssignment(ctx context.Context, request *sendingG
 		}
 		jobAssignment.BaseModel.CreatorID = &creatorId
 	}
+	jobAssignment.JobStatus = "Processing"
 
 	err = h.jobAssignmentRepo.CreateJobAssignment(ctx, jobAssignment)
 	if err != nil {

@@ -15,13 +15,13 @@ func NewSendingGrpcHandlers() SendingGrpcHandlers {
 	return SendingGrpcHandlers{}
 }
 
-func (h SendingGrpcHandlers) clientPricingGrpc() (sendingGrpc.PricingGrpcClient, error) {
-	conn, err := baseGrpc.ConnectGRPC(os.Getenv("PRICING_GRPC_HOST"), os.Getenv("PRICING_GRPC_PORT"))
+func (h SendingGrpcHandlers) clientPricingGrpc() (sendingGrpc.SendingGrpcClient, error) {
+	conn, err := baseGrpc.ConnectGRPC(os.Getenv("SENDING_GRPC_HOST"), os.Getenv("SENDING_GRPC_PORT"))
 	if err != nil {
 		return nil, err
 	}
 
-	return sendingGrpc.NewPricingGrpcClient(conn), nil
+	return sendingGrpc.NewSendingGrpcClient(conn), nil
 }
 
 func (h SendingGrpcHandlers) CreateJobAssignment(ctx context.Context, request model.CreateJobRequest) (*sendingGrpc.CreateJobAssignmentResponse, error) {
