@@ -7,6 +7,7 @@ import (
 	"booking-service/utils"
 	"encoding/json"
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"io"
 	"log"
 	"net/http"
@@ -113,5 +114,26 @@ func (h JobHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	tx.Commit()
 	utils.ResponseWithData(w, http.StatusCreated, job)
+	return
+}
+
+func (h JobHandler) GetOne(w http.ResponseWriter, r *http.Request) {
+	Id := mux.Vars(r)["id"]
+
+	UUID, err := uuid.Parse(Id)
+	if err != nil {
+		log.Println("Error when parse id: " + err.Error())
+		utils.ErrorResponse(w, http.StatusBadRequest, "Error when parse id: "+err.Error())
+		return
+	}
+
+	job, err := h.jobRepo.GetOneJob(r.Context(), UUID.String())
+	if err != nil {
+		log.Println("Error when get job: " + err.Error())
+		utils.ErrorResponse(w, http.StatusInternalServerError, "Error when get job: "+err.Error())
+		return
+	}
+
+	utils.ResponseWithData(w, http.StatusOK, job)
 	return
 }

@@ -37,6 +37,7 @@ func main() {
 	router.HandleFunc("/migration", migrationHandler.Migrate).Methods(http.MethodGet)
 
 	router.HandleFunc("/job/create", jobHandler.Create).Methods(http.MethodPost)
+	router.HandleFunc("/job/get-one/{id}", jobHandler.GetOne).Methods(http.MethodGet)
 
 	go StartGRPCServer(bookingHandlerGrpc)
 	log.Println("API is running in port: " + os.Getenv("PORT"))

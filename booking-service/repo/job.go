@@ -63,3 +63,17 @@ func (r JobRepo) GetListJobByBookDate(ctx context.Context, bookDate string) ([]m
 
 	return result, nil
 }
+
+func (r JobRepo) GetOneJob(ctx context.Context, jobId string) (*model.Job, error) {
+	ctx, cancel := context.WithTimeout(ctx, generalQueryTimeout)
+	defer cancel()
+
+	var result *model.Job
+	err := r.db.WithContext(ctx).Table("jobs").Where("id = ?", jobId).
+		Take(&result).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
