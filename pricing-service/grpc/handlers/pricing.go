@@ -37,6 +37,11 @@ func (h GRPCHandlers) CreatePrice(ctx context.Context, request *pricingGrpc.Crea
 		return messageResponse, err
 	}
 
+	price = &model.Price{
+		JobId: jobId,
+		Price: request.Price,
+	}
+
 	if request.CreatorId != "" {
 		creatorId, err = uuid.Parse(request.CreatorId)
 		if err != nil {
@@ -47,11 +52,6 @@ func (h GRPCHandlers) CreatePrice(ctx context.Context, request *pricingGrpc.Crea
 			return messageResponse, err
 		}
 		price.BaseModel.CreatorID = &creatorId
-	}
-
-	price = &model.Price{
-		JobId: jobId,
-		Price: request.Price,
 	}
 
 	err = h.priceRepo.CreatePrice(ctx, price)

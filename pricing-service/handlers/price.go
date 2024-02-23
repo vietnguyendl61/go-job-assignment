@@ -2,47 +2,63 @@ package handlers
 
 import (
 	"encoding/json"
-	"io"
+	"errors"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"log"
 	"net/http"
+	grpcHandler "pricing-service/grpc/handlers"
 	"pricing-service/model"
 	"pricing-service/repo"
+	"pricing-service/utils"
 )
 
 type PriceHandler struct {
-	priceRepo repo.PriceRepo
+	priceRepo          repo.PriceRepo
+	bookingHandlerGrpc grpcHandler.BookingGrpcHandlers
 }
 
 func NewPriceHandler(priceRepo repo.PriceRepo) PriceHandler {
 	return PriceHandler{priceRepo: priceRepo}
 }
 
-func (h PriceHandler) Create(w http.ResponseWriter, r *http.Request) {
-	defer func() {
-		err := r.Body.Close()
-		if err != nil {
-			log.Println("Error when close request body: " + err.Error())
+func (h PriceHandler) GetPrice(w http.ResponseWriter, r *http.Request) {
+	userId := r.Header.Get("x-user-id")
+	if userId == "" {
+		log.Println("Missing x-user-id")
+		utils.ErrorResponse(w, http.StatusBadRequest, "You must login first")
+		return
+	}
+
+	userUUID, err := uuid.Parse(userId)
+	if err != nil {
+		log.Println("Error when parse user id: " + err.Error())
+		utils.ErrorResponse(w, http.StatusBadRequest, "Error when parse user id: "+err.Error())
+		return
+	}
+
+	date := r.URL.Query().Get("date")
+
+	res, err := h.bookingHandlerGrpc.GetListJobByBookDate(r.Context(), userUUID, date)
+	if err != nil {
+		log.Println("Error when get list job: " + err.Error())
+		utils.ErrorResponse(w, http.StatusInternalServerError, "Error when get list job: "+err.Error())
+		return
+	}
+
+	var result []*model.Price
+	for _, v := range res.JobList {
+		price, err := h.priceRepo.GetPriceByJobId(r.Context(), v.Id)
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Println("Error when get price: " + err.Error())
+			utils.ErrorResponse(w, http.StatusInternalServerError, "Error when parse user id: "+err.Error())
+			return
 		}
-	}()
-	body, err := io.ReadAll(r.Body)
-
-	if err != nil {
-		log.Fatalln(err)
+		result = append(result, price)
 	}
 
-	price := &model.Price{}
-	err = json.Unmarshal(body, &price)
-	if err != nil {
-		log.Println(err)
-	}
-
-	err = h.priceRepo.CreatePrice(r.Context(), price)
-	if err != nil {
-		log.Println("Error when create price: " + err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-	}
 	// Send a 201 created response
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(price)
+	json.NewEncoder(w).Encode(result)
 }

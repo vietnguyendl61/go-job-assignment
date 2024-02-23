@@ -33,7 +33,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/migration", migrationHandler.Migrate).Methods(http.MethodGet)
 
-	router.HandleFunc("/price/create", priceHandler.Create).Methods(http.MethodPost)
+	router.HandleFunc("/price/get-list", priceHandler.GetPrice).Methods(http.MethodGet)
 
 	go StartGRPCServer(handlerGrpc)
 

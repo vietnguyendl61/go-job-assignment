@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package booking;
+option go_package = "booking/grpc/booking-proto";
+
+message Job {
+  string id = 1;
+  string book_date = 2;
+  string description = 3;
+}
+
+message GetListJobByBookDateRequest {
+  string creator_id = 1;
+  string book_date = 2;
+}
+
+message GetListJobByBookDateResponse {
+  repeated Job job_list = 1;
+}
+
+service BookingGrpc {
+  rpc GetListJobByBookDate(GetListJobByBookDateRequest) returns(GetListJobByBookDateResponse){}
+}
