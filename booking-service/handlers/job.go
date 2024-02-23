@@ -15,15 +15,18 @@ import (
 type JobHandler struct {
 	jobRepo          repo.JobRepo
 	priceHandlerGrpc grpcHandler.PriceGrpcHandlers
+	sendHandlerGrpc  grpcHandler.SendingGrpcHandlers
 }
 
 func NewJobHandler(
 	jobRepo repo.JobRepo,
 	priceHandlerGrpc grpcHandler.PriceGrpcHandlers,
+	sendHandlerGrpc grpcHandler.SendingGrpcHandlers,
 ) JobHandler {
 	return JobHandler{
 		jobRepo:          jobRepo,
 		priceHandlerGrpc: priceHandlerGrpc,
+		sendHandlerGrpc:  sendHandlerGrpc,
 	}
 }
 
@@ -89,6 +92,22 @@ func (h JobHandler) Create(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error when create job: " + err.Error())
 		utils.ErrorResponse(w, http.StatusBadRequest, "Error when create job: "+err.Error())
+		return
+	}
+
+	var listId []string
+	listId, err = h.jobRepo.GetListJobIdByBookDate(r.Context(), job.BookDate)
+	if err != nil {
+		log.Println("Error when get list job id by book date: " + err.Error())
+		utils.ErrorResponse(w, http.StatusInternalServerError, "Error when get list job id by book date: "+err.Error())
+		return
+	}
+	jobRequest.ListJobId = listId
+
+	_, err = h.sendHandlerGrpc.CreateJobAssignment(tx.Statement.Context, jobRequest)
+	if err != nil {
+		log.Println("Error when create job assignment: " + err.Error())
+		utils.ErrorResponse(w, http.StatusInternalServerError, "Error when create job assignment: "+err.Error())
 		return
 	}
 

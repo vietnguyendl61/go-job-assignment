@@ -31,3 +31,20 @@ func (r JobRepo) CreateJob(tx *gorm.DB, job *model.Job) error {
 
 	return nil
 }
+
+func (r JobRepo) GetListJobIdByBookDate(ctx context.Context, bookDate time.Time) ([]string, error) {
+	ctx, cancel := context.WithTimeout(ctx, generalQueryTimeout)
+	defer cancel()
+
+	var result []string
+	err := r.db.WithContext(ctx).Table("job").
+		Where("book_date between DATE_TRUNC('day', cast(? as timestamp)) and "+
+			"DATE_TRUNC('day', CAST(? AS timestamp)) + INTERVAL '1 day' - INTERVAL '1 microsecond'", bookDate, bookDate).
+		Pluck("job_id", &result).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+
+}

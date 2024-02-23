@@ -23,9 +23,10 @@ func main() {
 
 	migrationHandler := handlers.NewMigrationHandler(db)
 	priceHandlerGrpc := grpcHandler.NewPriceGrpcHandlers()
+	sendHandlerGrpc := grpcHandler.NewSendingGrpcHandlers()
 
 	jobRepo := repo.NewJobRepo(db)
-	jobHandler := handlers.NewJobHandler(jobRepo, priceHandlerGrpc)
+	jobHandler := handlers.NewJobHandler(jobRepo, priceHandlerGrpc, sendHandlerGrpc)
 
 	router := mux.NewRouter()
 	router.HandleFunc("/migration", migrationHandler.Migrate).Methods(http.MethodGet)

@@ -14,6 +14,7 @@ type Job struct {
 type CreateJobRequest struct {
 	CreatorId   *uuid.UUID
 	JobId       uuid.UUID
+	ListJobId   []string
 	BookDate    *time.Time `json:"book_date"`
 	Description string     `json:"description"`
 	Price       float64    `json:"price"`
