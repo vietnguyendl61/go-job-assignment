@@ -24,7 +24,7 @@ func (h PriceGrpcHandlers) clientPricingGrpc() (pricingGrpc.PricingGrpcClient, e
 	return pricingGrpc.NewPricingGrpcClient(conn), nil
 }
 
-func (h PriceGrpcHandlers) CreateStockRequestInput(ctx context.Context, request model.CreateJobRequest) (*pricingGrpc.CreatePriceResponse, error) {
+func (h PriceGrpcHandlers) CreatePrice(ctx context.Context, request model.CreateJobRequest) (*pricingGrpc.CreatePriceResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, baseGrpc.Timeout)
 	defer cancel()
 	grpcRequest := &pricingGrpc.CreatePriceRequest{

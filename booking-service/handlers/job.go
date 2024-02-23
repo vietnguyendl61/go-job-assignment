@@ -85,7 +85,7 @@ func (h JobHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	jobRequest.JobId = job.ID
 
-	_, err = h.priceHandlerGrpc.CreateStockRequestInput(tx.Statement.Context, jobRequest)
+	_, err = h.priceHandlerGrpc.CreatePrice(tx.Statement.Context, jobRequest)
 	if err != nil {
 		log.Println("Error when create job: " + err.Error())
 		utils.ErrorResponse(w, http.StatusBadRequest, "Error when create job: "+err.Error())

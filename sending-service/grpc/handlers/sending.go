@@ -8,10 +8,15 @@ import (
 type GRPCHandlers struct {
 	sendingGrpc.UnimplementedPricingGrpcServer
 	jobAssignmentRepo repo.JobAssignmentRepo
+	userHandlerGrpc   UserGrpcHandlers
 }
 
-func NewGRPCHandlers(jobAssignmentRepo repo.JobAssignmentRepo) GRPCHandlers {
+func NewGRPCHandlers(
+	jobAssignmentRepo repo.JobAssignmentRepo,
+	userHandlerGrpc UserGrpcHandlers,
+) GRPCHandlers {
 	return GRPCHandlers{
 		jobAssignmentRepo: jobAssignmentRepo,
+		userHandlerGrpc:   userHandlerGrpc,
 	}
 }

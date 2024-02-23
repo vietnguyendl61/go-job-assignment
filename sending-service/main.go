@@ -27,7 +27,8 @@ func main() {
 	jobAssignment := repo.NewJobAssignmentRepo(db)
 
 	migrationHandler := handlers.NewMigrationHandler(db)
-	sendingHandlerGrpc := sendingGrpcHandlers.NewGRPCHandlers(jobAssignment)
+	userHandlerGrpc := sendingGrpcHandlers.NewUserGrpcHandlers()
+	sendingHandlerGrpc := sendingGrpcHandlers.NewGRPCHandlers(jobAssignment, userHandlerGrpc)
 	jobHandler := handlers.NewJobAssignmentHandler(jobAssignment)
 
 	router := mux.NewRouter()

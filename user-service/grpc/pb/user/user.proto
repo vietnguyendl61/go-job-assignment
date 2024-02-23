@@ -12,6 +12,6 @@ message GetAllUserIdResponse {
   repeated string list_user_id = 1;
 }
 
-service PricingGrpc {
+service UserGrpc {
   rpc GetAllUserId(GetAllUserIdRequest) returns (GetAllUserIdResponse) {}
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type GRPCHandlers struct {
-	userGrpc.UnimplementedPricingGrpcServer
+	userGrpc.UnimplementedUserGrpcServer
 	userRepo repo.UserRepo
 }
 
