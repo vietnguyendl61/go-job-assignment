@@ -6,7 +6,7 @@ services:
       context: ./database
       dockerfile: Dockerfile
     environment:
-      POSTGRES_MULTIPLE_DATABASES: "sending,user,price,booking"
+      POSTGRES_MULTIPLE_DATABASES: "sending,user,booking"
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123456
