@@ -18,7 +18,7 @@ func NewJobAssignmentHandler(jobAssignmentRepo repo.JobAssignmentRepo) JobAssign
 }
 
 func (h JobAssignmentHandler) GetOne(w http.ResponseWriter, r *http.Request) {
-	Id := mux.Vars(r)["id"]
+	Id := mux.Vars(r)["job_id"]
 
 	UUID, err := uuid.Parse(Id)
 	if err != nil {
@@ -27,7 +27,7 @@ func (h JobAssignmentHandler) GetOne(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	job, err := h.jobAssignmentRepo.GetOne(r.Context(), UUID.String())
+	job, err := h.jobAssignmentRepo.GetOneByJobId(r.Context(), UUID.String())
 	if err != nil {
 		log.Println("Error when get job: " + err.Error())
 		utils.ErrorResponse(w, http.StatusInternalServerError, "Error when get job: "+err.Error())

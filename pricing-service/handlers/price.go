@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -58,7 +57,5 @@ func (h PriceHandler) GetPrice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send a 201 created response
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(result)
+	utils.ResponseWithData(w, http.StatusOK, result)
 }

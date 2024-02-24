@@ -47,12 +47,12 @@ func (r JobAssignmentRepo) GetListHelperIdByJobId(ctx context.Context, listJobId
 	return result, nil
 }
 
-func (r JobAssignmentRepo) GetOne(ctx context.Context, id string) (*model.JobAssignment, error) {
+func (r JobAssignmentRepo) GetOneByJobId(ctx context.Context, id string) (*model.JobAssignment, error) {
 	ctx, cancel := context.WithTimeout(ctx, generalQueryTimeout)
 	defer cancel()
 
 	var result *model.JobAssignment
-	err := r.db.WithContext(ctx).Table("job_assignments").Where("id = ?", id).
+	err := r.db.WithContext(ctx).Table("job_assignments").Where("job_id = ?", id).
 		Take(&result).Error
 	if err != nil {
 		return nil, err
