@@ -1,12 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"log"
 	"net"
 	"net/http"
@@ -14,19 +15,17 @@ import (
 	pricingGrpcHandlers "pricing-service/grpc/handlers"
 	pricingGrpc "pricing-service/grpc/pb/pricing"
 	"pricing-service/handlers"
-	"pricing-service/model"
 	"pricing-service/repo"
 )
 
 func main() {
 	err := godotenv.Load()
-	db := InitDB()
+	mongoClient, err := InitMongoDB()
 	if err != nil {
 		log.Fatalln("Error when init db: " + err.Error())
 	}
-	MigrateDB(db)
 
-	priceRepo := repo.NewPriceRepo(db)
+	priceRepo := repo.NewPriceRepo(mongoClient)
 
 	handlerGrpc := pricingGrpcHandlers.NewGRPCHandlers(priceRepo)
 	priceHandler := handlers.NewPriceHandler(priceRepo)
@@ -43,35 +42,25 @@ func main() {
 	}
 }
 
-func InitDB() *gorm.DB {
-	dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable",
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_NAME"),
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"))
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+func InitMongoDB() (*mongo.Client, error) {
+	credential := options.Credential{
+		Username: os.Getenv("MONGO_USER_NAME"),
+		Password: os.Getenv("MONGO_PASSWORD"),
+	}
 
+	clientOptions := options.Client().ApplyURI("mongodb://" + os.Getenv("MONGO_HOST") + ":" + os.Getenv("MONGO_PORT")).SetAuth(credential)
+	// Connect to MongoDB
+	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
+	}
+	// Check the connection
+	err = client.Ping(context.Background(), nil)
+	if err != nil {
+		return nil, err
 	}
 
-	return db
-}
-
-func MigrateDB(db *gorm.DB) {
-	_ = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
-	models := []interface{}{
-		&model.Price{},
-	}
-
-	for _, m := range models {
-		err := db.AutoMigrate(m)
-		if err != nil {
-			log.Println("Error when migrate: " + err.Error())
-			return
-		}
-	}
+	return client, nil
 }
 
 func StartGRPCServer(handleGRPC pricingGrpcHandlers.GRPCHandlers) {

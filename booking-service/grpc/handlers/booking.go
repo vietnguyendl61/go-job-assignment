@@ -27,7 +27,7 @@ func (h GRPCHandlers) GetListJobByBookDate(
 ) {
 	var err error
 	messageResponse := &bookingGrpc.GetListJobByBookDateResponse{}
-	result, err := h.jobRepo.GetListJobByBookDate(ctx, request.BookDate)
+	result, err := h.jobRepo.GetListJobByBookDateAndCreatorId(ctx, request.BookDate, request.CreatorId)
 	if err != nil {
 		return nil, err
 	}

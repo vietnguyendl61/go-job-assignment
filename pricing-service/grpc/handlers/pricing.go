@@ -38,7 +38,7 @@ func (h GRPCHandlers) CreatePrice(ctx context.Context, request *pricingGrpc.Crea
 	}
 
 	price = &model.Price{
-		JobId: jobId,
+		JobId: jobId.String(),
 		Price: request.Price,
 	}
 
@@ -51,10 +51,10 @@ func (h GRPCHandlers) CreatePrice(ctx context.Context, request *pricingGrpc.Crea
 			}
 			return messageResponse, err
 		}
-		price.BaseModel.CreatorID = &creatorId
+		price.BaseModel.CreatorID = creatorId.String()
 	}
 
-	err = h.priceRepo.CreatePrice(ctx, price)
+	err = h.priceRepo.CreatePriceMongo(ctx, price)
 	if err != nil {
 		messageResponse = &pricingGrpc.CreatePriceResponse{
 			StatusCode: http.StatusInternalServerError,

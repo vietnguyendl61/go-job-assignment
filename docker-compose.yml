@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  pg-service:
+    build: 
+      context: ./database
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_MULTIPLE_DATABASES: "sending,user,price,booking"
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5440:5432"
+    networks:
+      - job-assignment
+
+  mongo-service:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongo
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    ports:
+      - "27018:27017"
+    volumes:
+      - ./mongodb:/data/db
+    networks:
+      - job-assignment
+
+  booking-service:
+    build:
+      context: ./booking-service
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+      # - "10000:10000" GRPC INTERNAL
+    networks:
+      - job-assignment
+
+  pricing-service:
+    build:
+      context: ./pricing-service
+      dockerfile: Dockerfile
+    ports:
+      - "4001:4001"
+      # - "10001:10001" GRPC INTERNAL
+    networks:
+      - job-assignment
+
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    ports:
+      - "4003:4003"
+      # - "10003:10003" GRPC INTERNAL
+    networks:
+      - job-assignment
+
+  sending-service:
+    build:
+      context: ./sending-service
+      dockerfile: Dockerfile
+    ports:
+      - "4002:4002"
+      # - "10002:10002" GRPC INTERNAL
+    networks:
+      - job-assignment
+
+networks:
+  job-assignment:
+    # Use a custom driver
+    driver: bridge

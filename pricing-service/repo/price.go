@@ -2,7 +2,9 @@ package repo
 
 import (
 	"context"
-	"gorm.io/gorm"
+	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"pricing-service/model"
 	"time"
 )
@@ -12,18 +14,32 @@ const (
 )
 
 type PriceRepo struct {
-	db *gorm.DB
+	mongodb *mongo.Client
 }
 
-func NewPriceRepo(db *gorm.DB) PriceRepo {
-	return PriceRepo{db: db}
+func NewPriceRepo(mongodb *mongo.Client) PriceRepo {
+	return PriceRepo{mongodb: mongodb}
 }
 
-func (r PriceRepo) CreatePrice(ctx context.Context, price *model.Price) error {
-	ctx, cancel := context.WithTimeout(ctx, generalQueryTimeout)
-	defer cancel()
+func (r PriceRepo) GetPriceByJobId(ctx context.Context, jobId string) (*model.Price, error) {
+	var price *model.Price
+	filter := bson.D{{"job_id", jobId}}
+	err := r.mongodb.Database("price").Collection("price").FindOne(ctx, filter).Decode(&price)
+	if err != nil {
+		return nil, err
+	}
 
-	err := r.db.WithContext(ctx).Create(price).Error
+	return price, nil
+}
+
+func (r PriceRepo) CreatePriceMongo(ctx context.Context, price *model.Price) error {
+	price.ID = uuid.New().String()
+	price.CreatedAt = time.Now().String()
+	price.UpdatedAt = time.Now().String()
+
+	dataInsert, err := toDoc(price)
+
+	_, err = r.mongodb.Database("price").Collection("price").InsertOne(ctx, dataInsert)
 	if err != nil {
 		return err
 	}
@@ -31,20 +47,12 @@ func (r PriceRepo) CreatePrice(ctx context.Context, price *model.Price) error {
 	return nil
 }
 
-func (r PriceRepo) GetPriceByJobId(ctx context.Context, jobId string) (*model.Price, error) {
-	ctx, cancel := context.WithTimeout(ctx, generalQueryTimeout)
-	defer cancel()
-	var (
-		err    error
-		result *model.Price
-	)
-
-	err = r.db.WithContext(ctx).Table("prices").
-		Where("job_id = ?", jobId).
-		Take(&result).Error
+func toDoc(v interface{}) (doc *bson.D, err error) {
+	data, err := bson.Marshal(v)
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	return result, nil
+	err = bson.Unmarshal(data, &doc)
+	return
 }

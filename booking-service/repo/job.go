@@ -48,7 +48,7 @@ func (r JobRepo) GetListJobIdByBookDate(ctx context.Context, bookDate time.Time)
 	return result, nil
 }
 
-func (r JobRepo) GetListJobByBookDate(ctx context.Context, bookDate string) ([]model.Job, error) {
+func (r JobRepo) GetListJobByBookDateAndCreatorId(ctx context.Context, bookDate string, creatorId string) ([]model.Job, error) {
 	ctx, cancel := context.WithTimeout(ctx, generalQueryTimeout)
 	defer cancel()
 
@@ -56,6 +56,7 @@ func (r JobRepo) GetListJobByBookDate(ctx context.Context, bookDate string) ([]m
 	err := r.db.WithContext(ctx).Table("jobs").
 		Where("book_date between DATE_TRUNC('day', cast(? as timestamp)) and "+
 			"DATE_TRUNC('day', CAST(? AS timestamp)) + INTERVAL '1 day' - INTERVAL '1 microsecond'", bookDate, bookDate).
+		Where("creator_id = ?", creatorId).
 		Find(&result).Error
 	if err != nil {
 		return nil, err
