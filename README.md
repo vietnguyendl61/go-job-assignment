@@ -25,35 +25,15 @@ go mod tidy
 ```
 
 * Do the same thing with other services.
-## Configuration
-1. Set up your PostgreSQL database.
-2. Config file `.env` in each service:
-```env
-PORT=4000
-DB_PORT=5432
-DB_HOST=localhost
-DB_NAME=booking
-DB_USER=postgres
-DB_PASSWORD=123456
-GRPC_PORT=10000
-PRICING_GRPC_HOST=0.0.0.0
-PRICING_GRPC_PORT=10001
-SENDING_GRPC_HOST=0.0.0.0
-SENDING_GRPC_PORT=10002
-```
-**NOTE**:
-* `PRICING_GPRC_PORT` in this example is `GRPC_PORT` in `.env` of `pricing-service` and so on with other (`SENDING_GRPC_PORT`,`BOOKING_GRPC_PORT`,`USER_GRPC_PORT`)
-
 ## Usage
-1. Navigate to service directory:
+1. Navigate to directory:
 ```bash
-cd booking-service 
+cd go-job-assignment 
 ```
-2. Run the service:
+2. Run the service by docker compose:
 ```bash
-go run main.go 
+docker compose up
 ```
-3. Do same thing to other services.
 
 ## API Documentation
 ### Endpoint
