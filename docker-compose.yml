@@ -5,6 +5,7 @@ services:
     build: 
       context: ./database
       dockerfile: Dockerfile
+    restart: always
     environment:
       POSTGRES_MULTIPLE_DATABASES: "sending,user,booking"
       POSTGRES_DB: postgres
@@ -32,41 +33,53 @@ services:
     build:
       context: ./booking-service
       dockerfile: Dockerfile
+    restart: always
     ports:
       - "4000:4000"
       # - "10000:10000" GRPC INTERNAL
     networks:
       - job-assignment
+    depends_on:
+      - pg-service
 
   pricing-service:
     build:
       context: ./pricing-service
       dockerfile: Dockerfile
+    restart: always
     ports:
       - "4001:4001"
       # - "10001:10001" GRPC INTERNAL
     networks:
       - job-assignment
+    depends_on:
+      - mongo-service
 
   user-service:
     build:
       context: ./user-service
       dockerfile: Dockerfile
+    restart: always
     ports:
       - "4003:4003"
       # - "10003:10003" GRPC INTERNAL
     networks:
       - job-assignment
+    depends_on:
+      - pg-service
 
   sending-service:
     build:
       context: ./sending-service
       dockerfile: Dockerfile
+    restart: always
     ports:
       - "4002:4002"
       # - "10002:10002" GRPC INTERNAL
     networks:
       - job-assignment
+    depends_on:
+      - pg-service
 
 networks:
   job-assignment:
