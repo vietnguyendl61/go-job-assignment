@@ -14,6 +14,7 @@ import (
 	sendingGrpcHandlers "sending-service/grpc/handlers"
 	sendingGrpc "sending-service/grpc/pb/sending"
 	"sending-service/handlers"
+	"sending-service/model"
 	"sending-service/repo"
 )
 
@@ -23,17 +24,15 @@ func main() {
 	if err != nil {
 		log.Fatalln("Error when init db: " + err.Error())
 	}
+	MigrateDB(db)
 
 	jobAssignment := repo.NewJobAssignmentRepo(db)
 
-	migrationHandler := handlers.NewMigrationHandler(db)
 	userHandlerGrpc := sendingGrpcHandlers.NewUserGrpcHandlers()
 	sendingHandlerGrpc := sendingGrpcHandlers.NewGRPCHandlers(jobAssignment, userHandlerGrpc)
 	jobHandler := handlers.NewJobAssignmentHandler(jobAssignment)
 
 	router := mux.NewRouter()
-	router.HandleFunc("/migration", migrationHandler.Migrate).Methods(http.MethodGet)
-
 	router.HandleFunc("/job-assignment/get-one/{job_id}", jobHandler.GetOne).Methods(http.MethodGet)
 
 	go StartGRPCServer(sendingHandlerGrpc)
@@ -59,6 +58,21 @@ func InitDB() *gorm.DB {
 	}
 
 	return db
+}
+
+func MigrateDB(db *gorm.DB) {
+	_ = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
+	models := []interface{}{
+		&model.JobAssignment{},
+	}
+
+	for _, m := range models {
+		err := db.AutoMigrate(m)
+		if err != nil {
+			log.Println("Error when migrate: " + err.Error())
+			return
+		}
+	}
 }
 
 func StartGRPCServer(handleGRPC sendingGrpcHandlers.GRPCHandlers) {

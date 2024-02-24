@@ -14,6 +14,7 @@ import (
 	pricingGrpcHandlers "pricing-service/grpc/handlers"
 	pricingGrpc "pricing-service/grpc/pb/pricing"
 	"pricing-service/handlers"
+	"pricing-service/model"
 	"pricing-service/repo"
 )
 
@@ -23,16 +24,14 @@ func main() {
 	if err != nil {
 		log.Fatalln("Error when init db: " + err.Error())
 	}
+	MigrateDB(db)
 
 	priceRepo := repo.NewPriceRepo(db)
 
-	migrationHandler := handlers.NewMigrationHandler(db)
 	handlerGrpc := pricingGrpcHandlers.NewGRPCHandlers(priceRepo)
 	priceHandler := handlers.NewPriceHandler(priceRepo)
 
 	router := mux.NewRouter()
-	router.HandleFunc("/migration", migrationHandler.Migrate).Methods(http.MethodGet)
-
 	router.HandleFunc("/price/get-list", priceHandler.GetPrice).Methods(http.MethodGet)
 
 	go StartGRPCServer(handlerGrpc)
@@ -58,6 +57,21 @@ func InitDB() *gorm.DB {
 	}
 
 	return db
+}
+
+func MigrateDB(db *gorm.DB) {
+	_ = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
+	models := []interface{}{
+		&model.Price{},
+	}
+
+	for _, m := range models {
+		err := db.AutoMigrate(m)
+		if err != nil {
+			log.Println("Error when migrate: " + err.Error())
+			return
+		}
+	}
 }
 
 func StartGRPCServer(handleGRPC pricingGrpcHandlers.GRPCHandlers) {

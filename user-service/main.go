@@ -14,6 +14,7 @@ import (
 	userGrpcHandlers "user-service/grpc/handlers"
 	userGrpc "user-service/grpc/pb/user"
 	"user-service/handlers"
+	"user-service/model"
 	"user-service/repo"
 )
 
@@ -23,16 +24,14 @@ func main() {
 	if err != nil {
 		log.Fatalln("Error when init db: " + err.Error())
 	}
+	MigrateDB(db)
 
 	userRepo := repo.NewUserRepo(db)
 
-	migrationHandler := handlers.NewMigrationHandler(db)
 	userHandlerGrpc := userGrpcHandlers.NewGRPCHandlers(userRepo)
 	userHandler := handlers.NewUserHandler(userRepo)
 
 	router := mux.NewRouter()
-	router.HandleFunc("/migration", migrationHandler.Migrate).Methods(http.MethodGet)
-
 	router.HandleFunc("/user/register", userHandler.Register).Methods(http.MethodPost)
 	router.HandleFunc("/user/login", userHandler.Login).Methods(http.MethodPost)
 
@@ -59,6 +58,21 @@ func InitDB() *gorm.DB {
 	}
 
 	return db
+}
+
+func MigrateDB(db *gorm.DB) {
+	_ = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
+	models := []interface{}{
+		&model.User{},
+	}
+
+	for _, m := range models {
+		err := db.AutoMigrate(m)
+		if err != nil {
+			log.Println("Error when migrate: " + err.Error())
+			return
+		}
+	}
 }
 
 func StartGRPCServer(handleGRPC userGrpcHandlers.GRPCHandlers) {

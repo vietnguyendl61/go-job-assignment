@@ -4,6 +4,7 @@ import (
 	grpcHandler "booking-service/grpc/handlers"
 	bookingGrpc "booking-service/grpc/pb/booking"
 	"booking-service/handlers"
+	"booking-service/model"
 	"booking-service/repo"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -23,10 +24,10 @@ func main() {
 	if err != nil {
 		log.Fatalln("Error when init db: " + err.Error())
 	}
+	MigrateDB(db)
 
 	jobRepo := repo.NewJobRepo(db)
 
-	migrationHandler := handlers.NewMigrationHandler(db)
 	bookingHandlerGrpc := grpcHandler.NewGRPCHandlers(jobRepo)
 	priceHandlerGrpc := grpcHandler.NewPriceGrpcHandlers()
 	sendHandlerGrpc := grpcHandler.NewSendingGrpcHandlers()
@@ -34,7 +35,6 @@ func main() {
 	jobHandler := handlers.NewJobHandler(jobRepo, priceHandlerGrpc, sendHandlerGrpc)
 
 	router := mux.NewRouter()
-	router.HandleFunc("/migration", migrationHandler.Migrate).Methods(http.MethodGet)
 
 	router.HandleFunc("/job/create", jobHandler.Create).Methods(http.MethodPost)
 	router.HandleFunc("/job/get-one/{id}", jobHandler.GetOne).Methods(http.MethodGet)
@@ -60,6 +60,21 @@ func InitDB() *gorm.DB {
 	}
 
 	return db
+}
+
+func MigrateDB(db *gorm.DB) {
+	_ = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
+	models := []interface{}{
+		&model.Job{},
+	}
+
+	for _, m := range models {
+		err := db.AutoMigrate(m)
+		if err != nil {
+			log.Println("Error when migrate: " + err.Error())
+			return
+		}
+	}
 }
 
 func StartGRPCServer(handleGRPC grpcHandler.GRPCHandlers) {
